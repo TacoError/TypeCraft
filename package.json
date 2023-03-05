@@ -1,0 +1,30 @@
+{
+  "name": "typecraft",
+  "version": "1.0.0",
+  "description": "Minecraft clone written in TypeScript",
+  "private": true,
+  "scripts": {
+    "build": "npx parcel build ./src/index.js",
+    "test": "npx parcel ./src/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TacoError/TypeCraft.git"
+  },
+  "keywords": [
+    "minecraft",
+    "typescript",
+    "parcel",
+    "threejs"
+  ],
+  "author": "TacoError",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TacoError/TypeCraft/issues"
+  },
+  "homepage": "https://github.com/TacoError/TypeCraft#readme",
+  "dependencies": {
+    "parcel": "^2.8.3",
+    "three": "^0.150.1"
+  }
+}
