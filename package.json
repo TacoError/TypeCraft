@@ -4,8 +4,8 @@
   "description": "Minecraft clone written in TypeScript",
   "private": true,
   "scripts": {
-    "build": "npx parcel build ./src/index.js",
-    "test": "npx parcel ./src/index.js"
+    "build": "npx parcel build ./src/index.html",
+    "test": "npx parcel ./src/index.html"
   },
   "repository": {
     "type": "git",

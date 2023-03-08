@@ -10,6 +10,7 @@ export default class BlockRegistry {
         this.blocks = new Map();
         const defaultBoxGeometry: BoxGeometry = new BoxGeometry(1, 1, 1);
         this.blocks.set("Grass", new Block("Grass", TextureLoader.getTexture("Grass"), defaultBoxGeometry));
+        this.blocks.set("Dirt", new Block("Dirt", TextureLoader.getTexture("Dirt"), defaultBoxGeometry));
     }
 
     static getBlock(name: string) : Block {

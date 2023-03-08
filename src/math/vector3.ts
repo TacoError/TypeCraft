@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import Vector2 from "./vector2";
 
 export default class Vector3 {
 
@@ -38,22 +39,31 @@ export default class Vector3 {
         this._z = z;
     } 
 
-    add(add: Vector3) : void {
+    add(add: Vector3) : Vector3 {
         this._x += add.x;
         this._y += add.y;
         this._z = add.z;
+        return this;
     }
 
-    subtract(subtract: Vector3) : void {
+    subtract(subtract: Vector3) : Vector3 {
         this._x -= subtract.x;
         this._y -= subtract.y;
         this._z -= subtract.z;
+        return this;
     }
 
-    clone(clone: Vector3) : void {
+    clone(clone: Vector3) : Vector3 {
         this._x = clone.x;
         this._y = clone.y;
         this._z = clone.z;
+        return this;
+    }
+
+    shiftChunk(chunkPos: Vector2) : Vector3 {
+        this._x += chunkPos.x << 4;
+        this._z += chunkPos.z << 4;
+        return this;
     }
 
     toString() : string {

@@ -25,19 +25,22 @@ export default class Vector2 {
         this._z = z;
     }
 
-    add(add: Vector2) : void {
+    add(add: Vector2) : Vector2 {
         this._x += add.x;
         this._z += add.z;
+        return this;
     }
 
-    subtract(subtract: Vector2) : void {
+    subtract(subtract: Vector2) : Vector2 {
         this._x -= subtract.x;
         this._z -= subtract.z;
+        return this;
     }
 
-    clone(clone: Vector2) : void {
+    clone(clone: Vector2) : Vector2 {
         this._x = clone.x;
         this._z = clone.z;
+        return this;
     }
 
     toString() : string {

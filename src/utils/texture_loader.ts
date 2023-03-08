@@ -11,6 +11,7 @@ export default class TextureLoader {
     private static textures: Map<string, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
 
     static load() : void {
+        this.textures = new Map();
         const loader: THREE.TextureLoader = new THREE.TextureLoader();
         const toLoad: TextureData[] = [
             {
@@ -24,6 +25,11 @@ export default class TextureLoader {
                     "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/grass_side.png",
                     "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/grass_side.png"
                 ],
+            },
+            {
+                name: "Dirt",
+                sameAround: true,
+                toLoad: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/dirt.png"
             }
         ];
         for (const data of toLoad) {
