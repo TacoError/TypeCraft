@@ -4,26 +4,19 @@ export default class Block {
 
     private _name: string;
 
-    private _texture: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[];
+    private _id: number;
 
-    private _geometry: THREE.BoxGeometry;
-
-    constructor(name: string, texture: THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[], geometry: THREE.BoxGeometry) {
+    constructor(name: string, id: number) {
         this._name = name;
-        this._texture = texture;
-        this._geometry = geometry;
+        this._id = id;
     }
 
     get name() : string {
         return this._name;
     }
 
-    get geometry() : THREE.BoxGeometry {
-        return this._geometry;
-    }
-
-    get texture() : THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[] {
-        return this._texture;
+    get id() : number {
+        return this._id;
     }
 
 };

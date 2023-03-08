@@ -5,8 +5,10 @@ import World from "./world/world";
 import FlatGenerator from "./world/generator/types/flat_generator";
 import Vector2 from "./math/vector2";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import Movement from "./controls/movement";
 
-class TypeCraft {
+
+export default class TypeCraft {
 
     private _scene: THREE.Scene;
 
@@ -16,15 +18,18 @@ class TypeCraft {
     
     private _world: World;
 
-    private _orbit: OrbitControls;
+    private movement: Movement;
+
+    private orbit: OrbitControls;
 
     constructor() {
         this._scene = new THREE.Scene();
         this._renderer = new THREE.WebGLRenderer();
         this._renderer.setSize(window.innerWidth, window.innerHeight);
         this._camera = new THREE.PerspectiveCamera(90, window.innerWidth / window.innerHeight, 0.1, 1000);
-        this._orbit = new OrbitControls(this._camera, this._renderer.domElement);
-
+        //this.movement = new Movement(this, this._camera);
+        this.orbit = new OrbitControls(this._camera, this._renderer.domElement);
+        
         document.body.appendChild(this._renderer.domElement);
 
         this.load();
@@ -53,16 +58,21 @@ class TypeCraft {
             }
         }
         this._camera.position.z = 5;
+        this._camera.position.y = 50;
     }
 
     private renderLoop() : void {
         requestAnimationFrame(this.renderLoop.bind(this));
 
-        this._orbit.update();
+        //this.movement.update();
+        this.orbit.update();
 
         this._renderer.render(this._scene, this._camera);
     }
 
 };
-
+try{
 new TypeCraft();
+}catch(e) {
+alert(e);
+}

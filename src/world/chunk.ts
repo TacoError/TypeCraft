@@ -2,8 +2,11 @@ import * as THREE from "three";
 import Vector2 from "../math/vector2";
 import Block from "../block/block";
 import Vector3 from "../math/vector3";
+import World from "./world";
+import TextureLoader from "../utils/texture_loader";
+import * as BufferGeometryUtils from "three/examples/jsm/utils/BufferGeometryUtils";
 
-interface ChunkBlockInfo {
+export interface ChunkBlockInfo {
     position: Vector3,
     block: Block
 };
@@ -14,15 +17,18 @@ export default class Chunk {
 
     private blocks: Map<string, ChunkBlockInfo>;
 
-    private meshes: THREE.InstancedMesh[];
+    private _meshes: THREE.InstancedMesh[];
 
     private _isGenerated: boolean;
 
-    constructor(position: Vector2) {
+    private parent: World;
+
+    constructor(position: Vector2, parent: World) {
        this._position = position;
        this.blocks = new Map();
-       this.meshes = [];
+       this._meshes = [];
        this._isGenerated = false;
+       this.parent = parent;
     }
 
     get position() : Vector2 {
@@ -60,53 +66,76 @@ export default class Chunk {
     }
 
     unload(scene: THREE.Scene) : void {
-        for (const mesh of this.meshes) {
+        for (const mesh of this._meshes) {
             scene.remove(mesh);
         }
-        this.meshes = [];
+        this._meshes = [];
+    }
+
+    get meshes() : THREE.InstancedMesh[] {
+        return this._meshes;
     }
 
     isBlockAt(position: Vector3) : boolean {
         return this.blocks.get(position.toString()) !== undefined;
     }
 
-    // Todo: This function is weird, but any other way I tried didn't work?
     private isFullyCovered(position: Vector3) : boolean {
-        return this.isBlockAt(new Vector3(position.x + 1, position.y, position.z)) &&
-            this.isBlockAt(new Vector3(position.x - 1, position.y, position.z)) &&
-            this.isBlockAt(new Vector3(position.x, position.y + 1, position.z)) &&
-            this.isBlockAt(new Vector3(position.x, position.y - 1, position.z)) &&
-            this.isBlockAt(new Vector3(position.x, position.y, position.z + 1)) &&
-            this.isBlockAt(new Vector3(position.x, position.y, position.z - 1))
+        return this.isBlockAt(position.addNoEffect(new Vector3(1, 0, 0))) &&
+            this.isBlockAt(position.addNoEffect(new Vector3(-1, 0, 0))) &&
+            this.isBlockAt(position.addNoEffect(new Vector3(0, 1, 0))) &&
+            this.isBlockAt(position.addNoEffect(new Vector3(0, -1, 0))) &&
+            this.isBlockAt(position.addNoEffect(new Vector3(0, 0, 1))) &&
+            this.isBlockAt(position.addNoEffect(new Vector3(0, 0, -1)))
     }
 
     addToScene(scene: THREE.Scene) : void {
-        const blocks: Map<string, ChunkBlockInfo[]> = new Map();
-        this.blocks.forEach((block: ChunkBlockInfo, name: string) => {
-            if (this.isFullyCovered(block.position)) {
+        const sortedBlocks: Map<string, ChunkBlockInfo[]> = new Map();
+        this.blocks.forEach((info: ChunkBlockInfo) => {
+            if (this.isFullyCovered(info.position)) return;
+            if (sortedBlocks.has(info.block.name)) {
+                const values: ChunkBlockInfo[] = sortedBlocks.get(info.block.name) as ChunkBlockInfo[];
+                values.push(info);
+                sortedBlocks.set(info.block.name, values);
                 return;
             }
-            if (!blocks.has(name)) {
-                blocks.set(name, [block]);
-                return;
-            }
-            blocks.set(name, [...(blocks.get(name) as ChunkBlockInfo[]), block]);
+            sortedBlocks.set(info.block.name, [info]);
         });
-        let tempMesh: THREE.InstancedMesh;
-        const object3D: THREE.Object3D = new THREE.Object3D();
-        let tempPlaceHolder: number = 0;
-        blocks.forEach((_blocks: ChunkBlockInfo[]) => {
-            tempMesh = new THREE.InstancedMesh(_blocks[0].block.geometry, _blocks[0].block.texture, _blocks.length);
-            for (const block of _blocks) {
-                object3D.matrix.setPosition(block.position.shiftChunk(this._position).toThreeVector3());
-                tempMesh.setMatrixAt(tempPlaceHolder, object3D.matrix);
-                tempPlaceHolder++;
+        const xForward: THREE.PlaneGeometry = new THREE.PlaneGeometry(1, 1);
+        xForward.rotateY(Math.PI / 2);
+        xForward.translate(0.5, 0, 0);
+        const xBackward: THREE.PlaneGeometry = new THREE.PlaneGeometry(1, 1);
+        xBackward.rotateY(-Math.PI / 2)
+        xBackward.translate(-0.5, 0, 0);
+        const top: THREE.PlaneGeometry = new THREE.PlaneGeometry(1, 1);
+        let base: THREE.BufferAttribute | THREE.InterleavedBufferAttribute | THREE.GLBufferAttribute = top.getAttribute("uv");
+        base[5] = 0.5;
+        base[7] = 0.5;
+        top.setAttribute("uv", base);
+        top.rotateX(-Math.PI / 2);
+        top.translate(0, 0.5, 0);
+        const zForward: THREE.PlaneGeometry = new THREE.PlaneGeometry(1, 1);
+        zForward.translate(0, 0, 0.5);
+        const zBackward: THREE.PlaneGeometry = new THREE.PlaneGeometry(1, 1);
+        zBackward.rotateY(Math.PI);
+        zBackward.translate(0, 0, -0.5);
+        for (const geometries of [xForward, xBackward, zForward, zBackward]) {
+            base = geometries.getAttribute("uv");
+            base[1] = 0.5;
+            base[3] = 0.5;
+            geometries.setAttribute("uv", base);
+        }
+        const tempMatrix: THREE.Matrix4 = new THREE.Matrix4();
+        const geometries: THREE.BufferGeometry[] = [];
+        sortedBlocks.forEach((blocks: ChunkBlockInfo[]) => {
+            for (const block of blocks) {
+                tempMatrix.makeTranslation(block.position.x, block.position.y, block.position.z);
+                for (const geometry of [xForward, xBackward, zForward, zBackward, top]) {
+                    geometries.push(geometry.clone().applyMatrix4(tempMatrix));
+                }
             }
-            tempMesh.instanceMatrix.needsUpdate = true;
-            scene.add(tempMesh);
-            this.meshes.push(tempMesh);
-            tempPlaceHolder = 0;
         });
+        scene.add(new THREE.Mesh(BufferGeometryUtils.mergeBufferGeometries(geometries), TextureLoader.getTexture("Atlas")))
     }
  
 };

@@ -6,6 +6,7 @@ interface TextureData {
     toLoad: string | string[];
 }
 
+// No longer really needed, now that I use an atlas, but whatever.
 export default class TextureLoader {
 
     private static textures: Map<string, THREE.MeshBasicMaterial | THREE.MeshBasicMaterial[]>;
@@ -15,21 +16,9 @@ export default class TextureLoader {
         const loader: THREE.TextureLoader = new THREE.TextureLoader();
         const toLoad: TextureData[] = [
             {
-                name: "Grass",
-                sameAround: false,
-                toLoad: [
-                    "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/grass_side.png",
-                    "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/grass_side.png",
-                    "https://i.ibb.co/LnGXqJW/image.png", // this is grass top (gray in cdn?)
-                    "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/dirt.png",
-                    "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/grass_side.png",
-                    "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/grass_side.png"
-                ],
-            },
-            {
-                name: "Dirt",
+                name: "Atlas",
                 sameAround: true,
-                toLoad: "https://raw.githubusercontent.com/InventivetalentDev/minecraft-assets/1.8.9/assets/minecraft/textures/blocks/dirt.png"
+                toLoad: "https://i.ibb.co/vjcjxLQ/terrain.png" // 16x16
             }
         ];
         for (const data of toLoad) {
@@ -38,7 +27,7 @@ export default class TextureLoader {
                 continue;
             }
             const array: string[] = data.toLoad as string[];
-            this.textures.set(data.name, array.map(url => new THREE.MeshBasicMaterial({map: loader.load(url)})))
+            this.textures.set(data.name, array.map(url => new THREE.MeshBasicMaterial({side: THREE.DoubleSide, map: loader.load(url)})))
         }
     }
 

@@ -46,6 +46,11 @@ export default class Vector3 {
         return this;
     }
 
+    // Adds without affecting this vector3
+    addNoEffect(add: Vector3) : Vector3 {
+        return new Vector3(this._x + add.x, this._y + add.y, this._z + add.z);
+    }
+
     subtract(subtract: Vector3) : Vector3 {
         this._x -= subtract.x;
         this._y -= subtract.y;
@@ -60,6 +65,7 @@ export default class Vector3 {
         return this;
     }
 
+    // This is used in chunk meshing to add the world position to the chunk position.
     shiftChunk(chunkPos: Vector2) : Vector3 {
         this._x += chunkPos.x << 4;
         this._z += chunkPos.z << 4;

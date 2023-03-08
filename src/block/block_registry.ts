@@ -8,9 +8,8 @@ export default class BlockRegistry {
 
     static initialize() : void {
         this.blocks = new Map();
-        const defaultBoxGeometry: BoxGeometry = new BoxGeometry(1, 1, 1);
-        this.blocks.set("Grass", new Block("Grass", TextureLoader.getTexture("Grass"), defaultBoxGeometry));
-        this.blocks.set("Dirt", new Block("Dirt", TextureLoader.getTexture("Dirt"), defaultBoxGeometry));
+        this.blocks.set("Grass", new Block("Grass", 0));
+        this.blocks.set("Dirt", new Block("Dirt", 1));
     }
 
     static getBlock(name: string) : Block {
