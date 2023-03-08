@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/TacoError/TypeCraft#readme",
   "dependencies": {
+    "@types/three": "^0.149.0",
     "parcel": "^2.8.3",
     "three": "^0.150.1"
   }
